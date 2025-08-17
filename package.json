@@ -1,0 +1,14 @@
+{
+  "name": "dinotools",
+  "version": "1.0.0",
+  "description": "This is a repository I use to store my tools that I rely on in my daily freelance work: JSON management, log management, user-agent handling, and more.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Management"
+  ],
+  "author": "SrDinoTito",
+  "license": "ISC"
+}
