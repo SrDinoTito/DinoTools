@@ -235,3 +235,70 @@ console.log(mt.getTimeAgo(Date.now() - 60000)); // "1 min ago"
 console.log(mt.getTimeAgo("2025-08-17T12:00:00Z")); // "X days ago"
 ```
 ---
+
+# ProxyManager
+
+**ProxyManager** es una clase para gestionar proxies de forma avanzada en **Node.js**, ideal para scrapers, bots o cualquier aplicación que necesite:
+
+- Rotar proxies automáticamente.
+- Limitar el número de solicitudes concurrentes por proxy.
+- Poner en cooldown proxies que fallen varias veces consecutivas.
+- Rotar puertos de manera **round-robin**.
+- Liberar automáticamente proxies después de un timeout para evitar bloqueos.
+
+---
+
+## Características
+
+- Adquiere proxies disponibles respetando un máximo de solicitudes concurrentes.
+- Rotación de puertos **round-robin** por proxy.
+- Bloqueo temporal (cooldown) de proxies con fallos repetidos.
+- Auto-liberación de proxies tras timeout configurable.
+- Permite excluir ciertos proxies de la adquisición temporalmente.
+- Mantiene un registro interno del estado de cada proxy (conexiones activas, puerto actual, etc.).
+- Emite eventos al liberar proxies para permitir gestión asíncrona.
+- Método opcional para inspeccionar el estado actual de todos los proxies.
+
+---
+
+## Uso
+
+```ts
+import { ProxyManager, ProxyConfig } from './ProxyManager';
+
+// Definir configuración de proxies
+const proxyConfigs: ProxyConfig[] = [
+  {
+    host: "176.105.228.172",
+    ports: [12323, 12324, 12325],
+    username: "usuario1",
+    password: "pass1"
+  },
+  {
+    host: "140.99.118.220",
+    ports: [11323, 11324],
+    username: "usuario2",
+    password: "pass2"
+  }
+];
+
+// Crear instancia del manager con máximo 5 solicitudes concurrentes por proxy
+const proxyManager = new ProxyManager(proxyConfigs, 5);
+
+(async () => {
+  // Adquirir un proxy disponible
+  const { proxy, index } = await proxyManager.acquire();
+  console.log(`Usando proxy ${proxy.host}:${proxy.port}`);
+
+  // Reportar fallo si hubo problema
+  proxyManager.reportFailure(index);
+
+  // Liberar el proxy cuando ya no se use
+  proxyManager.release(index);
+
+  // Consultar estado actual de todos los proxies
+  console.log(proxyManager.getStatus());
+})();
+```
+
+---
